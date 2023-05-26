@@ -42,6 +42,13 @@ def van_der_pol(length: int, freq: int, col_imp: int, data_path: str, compar: bo
     The `van_der_pol_intermittency.dat` feeds the model with the dynamics of the Van der Pol Oscillator
     """
 
+    url = 'https://raw.githubusercontent.com/Anurag-Dutta/PINNTSF/master/datasets/van_der_pol_intermittency.dat'
+    r = requests.get(url, allow_redirects=True)
+    if not os.path.exists('datasets'):
+        os.mkdir('datasets')
+
+    open('datasets/van_der_pol_intermittency.dat', 'wb').write(r.content)
+
     data = np.genfromtxt('datasets/van_der_pol_intermittency.dat')
     training_set = pd.DataFrame(data).reset_index(drop=True)
     training_set = training_set.iloc[:, 1]
@@ -52,11 +59,8 @@ def van_der_pol(length: int, freq: int, col_imp: int, data_path: str, compar: bo
     """
 
     t_diff = freq
-    # print(training_set.max())
     gradient_t = (training_set.diff() / t_diff).iloc[1:]  # dx/dt
-    # print(gradient_t)
     gradient_tt = (gradient_t.diff() / t_diff).iloc[1:]  # d2x/dt2
-    # print(gradient_tt)
 
     """## Loading Datasets
 
@@ -111,14 +115,6 @@ def van_der_pol(length: int, freq: int, col_imp: int, data_path: str, compar: bo
 
     for iter in range(1, length + 1):
         data.drop(['var2(t-' + str(iter) + ')', 'var3(t-' + str(iter) + ')'], axis=1, inplace=True)
-    # print(data.head())
-    # print(data.columns)
-    #
-    # data.shape
-    #
-    # data[0:len(data)-1].shape
-    #
-    # data.tail(1).shape
 
     train_1 = np.array(data[0:len(data) - 1])
     test_1 = np.array(data.tail(1))
@@ -136,9 +132,8 @@ def van_der_pol(length: int, freq: int, col_imp: int, data_path: str, compar: bo
 
     trainX = trainX.reshape((trainX.shape[0], 1, trainX.shape[1]))
     forecastX = forecastX.reshape((forecastX.shape[0], 1, forecastX.shape[1]))
-    # print(trainX.shape, trainy.shape, forecastX.shape)
 
-    """## Model (Without Monte Carlo Dropout)"""
+    """## Model (Van der Pol inspired Neural Network)"""
 
     mu = tf.Variable(4, name="mu", trainable=True, dtype=tf.float32)
     splitr = 0.5
@@ -160,30 +155,18 @@ def van_der_pol(length: int, freq: int, col_imp: int, data_path: str, compar: bo
         trainX[int(splitr * trainX.shape[0]):trainX.shape[0]], trainy[int(splitr * trainX.shape[0]):trainX.shape[0]]),
                         shuffle=False)
 
-    """## Prediction (Without Monte Carlo Dropout)"""
+    """## Prediction"""
 
     forecast_without_mc = forecastX
     yhat_without_mc = model.predict(forecast_without_mc)  # Step Ahead Prediction ('length' 'freq')
     forecast_without_mc = forecast_without_mc.reshape(
         (forecast_without_mc.shape[0], forecast_without_mc.shape[2]))  # Historical Input
 
-    # forecastX.shape
-    #
-    # forecast_without_mc.shape
-
     inv_yhat_without_mc = np.concatenate((forecast_without_mc, yhat_without_mc),
                                          axis=1)  # Concatenation of predicted values with Historical Data
     inv_yhat_without_mc = scaler.inverse_transform(inv_yhat_without_mc)  # Transform labels back to original encoding
 
-    # inv_yhat_without_mc.shape
-
-    # inv_yhat_without_mc
-
-    # inv_yhat_without_mc[:,-int(length*3.0):].shape
-
     fforecast = inv_yhat_without_mc[:, -int(length * 3.0):]
-
-    # fforecast
 
     case_forecast = fforecast[:, 0:int((length * 3.0) - 1):3]
 
@@ -208,6 +191,13 @@ def lienard(length: int, freq: int, col_imp: int, data_path: str, compar: bool):
     The `lienard_intermittency.dat` feeds the model with the dynamics of the Lienard System
     """
 
+    url = 'https://raw.githubusercontent.com/Anurag-Dutta/PINNTSF/master/datasets/lienard_intermittency.dat'
+    r = requests.get(url, allow_redirects=True)
+    if not os.path.exists('datasets'):
+        os.mkdir('datasets')
+
+    open('datasets/lienard_intermittency.dat', 'wb').write(r.content)
+
     data = np.genfromtxt('datasets/lienard_intermittency.dat')
     training_set = pd.DataFrame(data).reset_index(drop=True)
     training_set = training_set.iloc[:, 1]
@@ -218,11 +208,8 @@ def lienard(length: int, freq: int, col_imp: int, data_path: str, compar: bool):
     """
 
     t_diff = freq
-    # print(training_set.max())
     gradient_t = (training_set.diff() / t_diff).iloc[1:]  # dx/dt
-    # print(gradient_t)
     gradient_tt = (gradient_t.diff() / t_diff).iloc[1:]  # d2x/dt2
-    # print(gradient_tt)
 
     """## Loading Datasets
 
@@ -277,14 +264,6 @@ def lienard(length: int, freq: int, col_imp: int, data_path: str, compar: bool):
 
     for iter in range(1, length + 1):
         data.drop(['var2(t-' + str(iter) + ')', 'var3(t-' + str(iter) + ')'], axis=1, inplace=True)
-    # print(data.head())
-    # print(data.columns)
-    #
-    # data.shape
-    #
-    # data[0:len(data)-1].shape
-    #
-    # data.tail(1).shape
 
     train_1 = np.array(data[0:len(data) - 1])
     test_1 = np.array(data.tail(1))
@@ -302,9 +281,8 @@ def lienard(length: int, freq: int, col_imp: int, data_path: str, compar: bool):
 
     trainX = trainX.reshape((trainX.shape[0], 1, trainX.shape[1]))
     forecastX = forecastX.reshape((forecastX.shape[0], 1, forecastX.shape[1]))
-    # print(trainX.shape, trainy.shape, forecastX.shape)
 
-    """## Model (Without Monte Carlo Dropout)"""
+    """## Model (Lienard inspired Neural Network)"""
 
     a = tf.Variable(0.45, name="a", trainable=True, dtype=tf.float32)
     b = tf.Variable(0.5, name="b", trainable=True, dtype=tf.float32)
@@ -329,30 +307,18 @@ def lienard(length: int, freq: int, col_imp: int, data_path: str, compar: bool):
             trainy[int(splitr * trainX.shape[0]):trainX.shape[0]]),
                         shuffle=False)
 
-    """## Prediction (Without Monte Carlo Dropout)"""
+    """## Prediction"""
 
     forecast_without_mc = forecastX
     yhat_without_mc = model.predict(forecast_without_mc)  # Step Ahead Prediction ('length' 'freq')
     forecast_without_mc = forecast_without_mc.reshape(
         (forecast_without_mc.shape[0], forecast_without_mc.shape[2]))  # Historical Input
 
-    # forecastX.shape
-    #
-    # forecast_without_mc.shape
-
     inv_yhat_without_mc = np.concatenate((forecast_without_mc, yhat_without_mc),
                                          axis=1)  # Concatenation of predicted values with Historical Data
     inv_yhat_without_mc = scaler.inverse_transform(inv_yhat_without_mc)  # Transform labels back to original encoding
 
-    # inv_yhat_without_mc.shape
-
-    # inv_yhat_without_mc
-
-    # inv_yhat_without_mc[:,-int(length*3.0):].shape
-
     fforecast = inv_yhat_without_mc[:, -int(length * 3.0):]
-
-    # fforecast
 
     case_forecast = fforecast[:, 0:int((length * 3.0) - 1):3]
 
@@ -377,6 +343,13 @@ def lorenz(length: int, freq: int, col_imp: int, data_path: str, compar: bool):
     The `lorenz_intermittency.dat` feeds the model with the dynamics of the Lorenz Attractor
     """
 
+    url = 'https://raw.githubusercontent.com/Anurag-Dutta/PINNTSF/master/datasets/lorenz_intermittency.dat'
+    r = requests.get(url, allow_redirects=True)
+    if not os.path.exists('datasets'):
+        os.mkdir('datasets')
+
+    open('datasets/lorenz_intermittency.dat', 'wb').write(r.content)
+
     data = np.genfromtxt('datasets/lorenz_intermittency.dat')
     training_set = pd.DataFrame(data).reset_index(drop=True)
     training_set = training_set.iloc[:, 1]
@@ -387,11 +360,8 @@ def lorenz(length: int, freq: int, col_imp: int, data_path: str, compar: bool):
     """
 
     t_diff = freq
-    # print(training_set.max())
     gradient_t = (training_set.diff() / t_diff).iloc[1:]  # dx/dt
-    # print(gradient_t)
     gradient_tt = (gradient_t.diff() / t_diff).iloc[1:]  # d2x/dt2
-    # print(gradient_tt)
 
     """## Loading Datasets
 
@@ -446,14 +416,6 @@ def lorenz(length: int, freq: int, col_imp: int, data_path: str, compar: bool):
 
     for iter in range(1, length + 1):
         data.drop(['var2(t-' + str(iter) + ')', 'var3(t-' + str(iter) + ')'], axis=1, inplace=True)
-    # print(data.head())
-    # print(data.columns)
-    #
-    # data.shape
-    #
-    # data[0:len(data)-1].shape
-    #
-    # data.tail(1).shape
 
     train_1 = np.array(data[0:len(data) - 1])
     test_1 = np.array(data.tail(1))
@@ -471,9 +433,8 @@ def lorenz(length: int, freq: int, col_imp: int, data_path: str, compar: bool):
 
     trainX = trainX.reshape((trainX.shape[0], 1, trainX.shape[1]))
     forecastX = forecastX.reshape((forecastX.shape[0], 1, forecastX.shape[1]))
-    # print(trainX.shape, trainy.shape, forecastX.shape)
 
-    """## Model (Without Monte Carlo Dropout)"""
+    """## Model (Lorenz inspired Neural Network)"""
 
     s = tf.Variable(10, name="sigma", trainable=True, dtype=tf.float32)
     r = tf.Variable(28, name="rhow", trainable=True, dtype=tf.float32)
@@ -496,30 +457,18 @@ def lorenz(length: int, freq: int, col_imp: int, data_path: str, compar: bool):
             trainy[int(splitr * trainX.shape[0]):trainX.shape[0]]),
                         shuffle=False)
 
-    """## Prediction (Without Monte Carlo Dropout)"""
+    """## Prediction"""
 
     forecast_without_mc = forecastX
     yhat_without_mc = model.predict(forecast_without_mc)  # Step Ahead Prediction ('length' 'freq')
     forecast_without_mc = forecast_without_mc.reshape(
         (forecast_without_mc.shape[0], forecast_without_mc.shape[2]))  # Historical Input
 
-    # forecastX.shape
-    #
-    # forecast_without_mc.shape
-
     inv_yhat_without_mc = np.concatenate((forecast_without_mc, yhat_without_mc),
                                          axis=1)  # Concatenation of predicted values with Historical Data
     inv_yhat_without_mc = scaler.inverse_transform(inv_yhat_without_mc)  # Transform labels back to original encoding
 
-    # inv_yhat_without_mc.shape
-
-    # inv_yhat_without_mc
-
-    # inv_yhat_without_mc[:,-int(length*3.0):].shape
-
     fforecast = inv_yhat_without_mc[:, -int(length * 3.0):]
-
-    # fforecast
 
     case_forecast = fforecast[:, 0:int((length * 3.0) - 1):3]
 
@@ -544,6 +493,13 @@ def lotka_volterra(length: int, freq: int, col_imp: int, data_path: str, compar:
     The `lotka_volterra_intermittency.dat` feeds the model with the dynamics of the Lotka Volterra Equations
     """
 
+    url = 'https://raw.githubusercontent.com/Anurag-Dutta/PINNTSF/master/datasets/lotka_volterra_intermittency.dat'
+    r = requests.get(url, allow_redirects=True)
+    if not os.path.exists('datasets'):
+        os.mkdir('datasets')
+
+    open('datasets/lotka_volterra_intermittency.dat', 'wb').write(r.content)
+
     data = np.genfromtxt('datasets/lotka_volterra_intermittency.dat')
     training_set = pd.DataFrame(data).reset_index(drop=True)
     training_set = training_set.iloc[:, 1]
@@ -554,11 +510,8 @@ def lotka_volterra(length: int, freq: int, col_imp: int, data_path: str, compar:
     """
 
     t_diff = freq
-    # print(training_set.max())
     gradient_t = (training_set.diff() / t_diff).iloc[1:]  # dx/dt
-    # print(gradient_t)
     gradient_tt = (gradient_t.diff() / t_diff).iloc[1:]  # d2x/dt2
-    # print(gradient_tt)
 
     """## Loading Datasets
 
@@ -613,14 +566,6 @@ def lotka_volterra(length: int, freq: int, col_imp: int, data_path: str, compar:
 
     for iter in range(1, length + 1):
         data.drop(['var2(t-' + str(iter) + ')', 'var3(t-' + str(iter) + ')'], axis=1, inplace=True)
-    # print(data.head())
-    # print(data.columns)
-    #
-    # data.shape
-    #
-    # data[0:len(data)-1].shape
-    #
-    # data.tail(1).shape
 
     train_1 = np.array(data[0:len(data) - 1])
     test_1 = np.array(data.tail(1))
@@ -638,9 +583,8 @@ def lotka_volterra(length: int, freq: int, col_imp: int, data_path: str, compar:
 
     trainX = trainX.reshape((trainX.shape[0], 1, trainX.shape[1]))
     forecastX = forecastX.reshape((forecastX.shape[0], 1, forecastX.shape[1]))
-    # print(trainX.shape, trainy.shape, forecastX.shape)
 
-    """## Model (Without Monte Carlo Dropout)"""
+    """## Model (Lotka Volterra inspired Neural Network)"""
 
     a = tf.Variable(0.1, name="alpha", trainable=True, dtype=tf.float32)
     b = tf.Variable(0.05, name="beta", trainable=True, dtype=tf.float32)
@@ -671,30 +615,18 @@ def lotka_volterra(length: int, freq: int, col_imp: int, data_path: str, compar:
             trainy[int(splitr * trainX.shape[0]):trainX.shape[0]]),
                         shuffle=False)
 
-    """## Prediction (Without Monte Carlo Dropout)"""
+    """## Prediction"""
 
     forecast_without_mc = forecastX
     yhat_without_mc = model.predict(forecast_without_mc)  # Step Ahead Prediction ('length' 'freq')
     forecast_without_mc = forecast_without_mc.reshape(
         (forecast_without_mc.shape[0], forecast_without_mc.shape[2]))  # Historical Input
 
-    # forecastX.shape
-    #
-    # forecast_without_mc.shape
-
     inv_yhat_without_mc = np.concatenate((forecast_without_mc, yhat_without_mc),
                                          axis=1)  # Concatenation of predicted values with Historical Data
     inv_yhat_without_mc = scaler.inverse_transform(inv_yhat_without_mc)  # Transform labels back to original encoding
 
-    # inv_yhat_without_mc.shape
-
-    # inv_yhat_without_mc
-
-    # inv_yhat_without_mc[:,-int(length*3.0):].shape
-
     fforecast = inv_yhat_without_mc[:, -int(length * 3.0):]
-
-    # fforecast
 
     case_forecast = fforecast[:, 0:int((length * 3.0) - 1):3]
 
@@ -719,6 +651,13 @@ def duffing(length: int, freq: int, col_imp: int, data_path: str, compar: bool):
     The `duffing_intermittency.dat` feeds the model with the dynamics of the Duffing Equations
     """
 
+    url = 'https://raw.githubusercontent.com/Anurag-Dutta/PINNTSF/master/datasets/duffing_intermittency.dat'
+    r = requests.get(url, allow_redirects=True)
+    if not os.path.exists('datasets'):
+        os.mkdir('datasets')
+
+    open('datasets/duffing_intermittency.dat', 'wb').write(r.content)
+
     data = np.genfromtxt('datasets/duffing_intermittency.dat')
     training_set = pd.DataFrame(data).reset_index(drop=True)
     training_set = training_set.iloc[:, 1]
@@ -729,11 +668,8 @@ def duffing(length: int, freq: int, col_imp: int, data_path: str, compar: bool):
     """
 
     t_diff = freq
-    # print(training_set.max())
     gradient_t = (training_set.diff() / t_diff).iloc[1:]  # dx/dt
-    # print(gradient_t)
     gradient_tt = (gradient_t.diff() / t_diff).iloc[1:]  # d2x/dt2
-    # print(gradient_tt)
 
     """## Loading Datasets
 
@@ -788,14 +724,6 @@ def duffing(length: int, freq: int, col_imp: int, data_path: str, compar: bool):
 
     for iter in range(1, length + 1):
         data.drop(['var2(t-' + str(iter) + ')', 'var3(t-' + str(iter) + ')'], axis=1, inplace=True)
-    # print(data.head())
-    # print(data.columns)
-    #
-    # data.shape
-    #
-    # data[0:len(data)-1].shape
-    #
-    # data.tail(1).shape
 
     train_1 = np.array(data[0:len(data) - 1])
     test_1 = np.array(data.tail(1))
@@ -815,7 +743,7 @@ def duffing(length: int, freq: int, col_imp: int, data_path: str, compar: bool):
     forecastX = forecastX.reshape((forecastX.shape[0], 1, forecastX.shape[1]))
     # print(trainX.shape, trainy.shape, forecastX.shape)
 
-    """## Model (Without Monte Carlo Dropout)"""
+    """## Model (Duffing inspired Neural Network)"""
 
     a = tf.Variable(0.1, name="alpha", trainable=True, dtype=tf.float32)
     b = tf.Variable(0.05, name="beta", trainable=True, dtype=tf.float32)
@@ -840,30 +768,18 @@ def duffing(length: int, freq: int, col_imp: int, data_path: str, compar: bool):
             trainy[int(splitr * trainX.shape[0]):trainX.shape[0]]),
                         shuffle=False)
 
-    """## Prediction (Without Monte Carlo Dropout)"""
+    """## Prediction"""
 
     forecast_without_mc = forecastX
     yhat_without_mc = model.predict(forecast_without_mc)  # Step Ahead Prediction ('length' 'freq')
     forecast_without_mc = forecast_without_mc.reshape(
         (forecast_without_mc.shape[0], forecast_without_mc.shape[2]))  # Historical Input
 
-    # forecastX.shape
-    #
-    # forecast_without_mc.shape
-
     inv_yhat_without_mc = np.concatenate((forecast_without_mc, yhat_without_mc),
                                          axis=1)  # Concatenation of predicted values with Historical Data
     inv_yhat_without_mc = scaler.inverse_transform(inv_yhat_without_mc)  # Transform labels back to original encoding
 
-    # inv_yhat_without_mc.shape
-
-    # inv_yhat_without_mc
-
-    # inv_yhat_without_mc[:,-int(length*3.0):].shape
-
     fforecast = inv_yhat_without_mc[:, -int(length * 3.0):]
-
-    # fforecast
 
     case_forecast = fforecast[:, 0:int((length * 3.0) - 1):3]
 
@@ -888,6 +804,13 @@ def henon_heiles(length: int, freq: int, col_imp: int, data_path: str, compar: b
     The `henon_heiles_intermittency.dat` feeds the model with the dynamics of the Henon Heiles Equations.
     """
 
+    url = 'https://raw.githubusercontent.com/Anurag-Dutta/PINNTSF/master/datasets/henon_heiles_intermittency.dat'
+    r = requests.get(url, allow_redirects=True)
+    if not os.path.exists('datasets'):
+        os.mkdir('datasets')
+
+    open('datasets/henon_heiles_intermittency.dat', 'wb').write(r.content)
+
     data = np.genfromtxt('datasets/henon_heiles_intermittency.dat')
     training_set = pd.DataFrame(data).reset_index(drop=True)
     training_set = training_set.iloc[:, 1]
@@ -898,11 +821,8 @@ def henon_heiles(length: int, freq: int, col_imp: int, data_path: str, compar: b
     """
 
     t_diff = freq
-    # print(training_set.max())
     gradient_t = (training_set.diff() / t_diff).iloc[1:]  # dx/dt
-    # print(gradient_t)
     gradient_tt = (gradient_t.diff() / t_diff).iloc[1:]  # d2x/dt2
-    # print(gradient_tt)
 
     """## Loading Datasets
 
@@ -957,14 +877,6 @@ def henon_heiles(length: int, freq: int, col_imp: int, data_path: str, compar: b
 
     for iter in range(1, length + 1):
         data.drop(['var2(t-' + str(iter) + ')', 'var3(t-' + str(iter) + ')'], axis=1, inplace=True)
-    # print(data.head())
-    # print(data.columns)
-    #
-    # data.shape
-    #
-    # data[0:len(data)-1].shape
-    #
-    # data.tail(1).shape
 
     train_1 = np.array(data[0:len(data) - 1])
     test_1 = np.array(data.tail(1))
@@ -984,7 +896,7 @@ def henon_heiles(length: int, freq: int, col_imp: int, data_path: str, compar: b
     forecastX = forecastX.reshape((forecastX.shape[0], 1, forecastX.shape[1]))
     # print(trainX.shape, trainy.shape, forecastX.shape)
 
-    """## Model (Without Monte Carlo Dropout)"""
+    """## Model (Henon Heiles inspired Neural Network)"""
 
     splitr = 0.5
 
@@ -1005,30 +917,18 @@ def henon_heiles(length: int, freq: int, col_imp: int, data_path: str, compar: b
             trainy[int(splitr * trainX.shape[0]):trainX.shape[0]]),
                         shuffle=False)
 
-    """## Prediction (Without Monte Carlo Dropout)"""
+    """## Prediction"""
 
     forecast_without_mc = forecastX
     yhat_without_mc = model.predict(forecast_without_mc)  # Step Ahead Prediction ('length' 'freq')
     forecast_without_mc = forecast_without_mc.reshape(
         (forecast_without_mc.shape[0], forecast_without_mc.shape[2]))  # Historical Input
 
-    # forecastX.shape
-    #
-    # forecast_without_mc.shape
-
     inv_yhat_without_mc = np.concatenate((forecast_without_mc, yhat_without_mc),
                                          axis=1)  # Concatenation of predicted values with Historical Data
     inv_yhat_without_mc = scaler.inverse_transform(inv_yhat_without_mc)  # Transform labels back to original encoding
 
-    # inv_yhat_without_mc.shape
-
-    # inv_yhat_without_mc
-
-    # inv_yhat_without_mc[:,-int(length*3.0):].shape
-
     fforecast = inv_yhat_without_mc[:, -int(length * 3.0):]
-
-    # fforecast
 
     case_forecast = fforecast[:, 0:int((length * 3.0) - 1):3]
 
