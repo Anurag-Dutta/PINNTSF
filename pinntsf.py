@@ -1007,11 +1007,11 @@ This 6 parameters, must be addressed
 *******************************************************************************************
 """
 
-param0 = "van_der_pol"  # Physical Dynamics
-param1 = 13  # Forecast Length
-param2 = 7  # Frequency of Data (Hourly -- 1/24, Daily -- 1, Weekly -- 7, and so on...)
-param3 = 1  # Attribute of dataset, subjected to forecast.
-param4 = "datasets/elnino.csv"  # Data path
+param0 = "lienard"  # Physical Dynamics
+param1 = 48  # Forecast Length
+param2 = 0.0416  # Frequency of Data (Hourly -- 1/24, Daily -- 1, Weekly -- 7, and so on...)
+param3 = 0  # Attribute of dataset, subjected to forecast.
+param4 = "datasets/philippines.csv"  # Data path
 param5 = True  # Fetch the metrics, Training + Testing (True -- Yes, False -- No)
 
 pinntsf(param0, param1, param2, param3, param4, param5)
